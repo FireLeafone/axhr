@@ -1,0 +1,11 @@
+# See https://help.github.com/ignore-files/ for more about ignoring files.
+*.zip
+*.rar
+*.log
+.svn
+.DS_Store
+.com.apple.timemachine.supported
+node_modules
+build
+dist
+npm-debug.log*
