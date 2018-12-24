@@ -29,7 +29,7 @@
  */
 
 import axios from 'axios';
-import {isObject, isArray, setData} from './utils';
+import {isObject, setData} from './utils';
 
 const server = axios;
 
@@ -55,7 +55,7 @@ server.interceptors.response.use(function (response) {
  * ```js
  *  options = {
  *    url: 'api',  //{string} url , The URL we want to request
- *    type: 'GET,
+ *    type: 'GET',
  *    baseUrl: 'http://', xhr实例的baseUrl
  *    data: {},
  *    success: res => {},
@@ -89,8 +89,8 @@ export default function xhr (options) {
     params = setData(params) || {};
   } else if (config.headers['Content-Type'].indexOf('multipart/form-data') >= 0) { // upload file
     const formData = new FormData();
-    Object.keys(option.data).map(key => {
-      formData.append(key, option.data[key]);
+    Object.keys(options.data).map(key => {
+      formData.append(key, options.data[key]);
     });
     params = formData;
   }

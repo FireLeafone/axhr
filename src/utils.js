@@ -49,6 +49,5 @@ export function setData (params) {
   } else {
     return new Error('options.data is object type');
   }
-
   return sendData;
 }
