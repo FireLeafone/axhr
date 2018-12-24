@@ -2,18 +2,34 @@
 
 > XHR is configurable based on [axios](https://github.com/axios/axios) ⏲
 
+---
+
+[![AXHR][axhr-img]][axhr-url]
+[![AXHR version][npm-img]][npm-url]
+[![npm download][download-img]][download-url]
+[![build status][travis-img]][travis-url]
+
+[axhr-url]: https://github.com/FireLeafone/axhr
+[axhr-img]: https://img.shields.io/badge/axhr-coding-green.svg
+[npm-url]: https://www.npmjs.com/package/axhr
+[npm-img]: https://img.shields.io/npm/v/axhr.svg
+[download-url]: https://www.npmjs.com/package/axhr
+[download-img]: https://img.shields.io/npm/dm/axhr.svg
+[travis-url]: https://travis-ci.org/FireLeafone/axhr
+[travis-img]: https://travis-ci.org/FireLeafone/axhr.svg?branch=master
+
 ## Installing
 
 Using npm:
 
-```
-$ npm install axhr
+```npm
+npm install axhr
 ```
 
 Using bower:
 
-```
-$ bower install axhr
+```npm
+bower install axhr
 ```
 
 ## config
