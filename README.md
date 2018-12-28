@@ -43,7 +43,9 @@ xhr({
   data: {},
   success: res => {},
   error: res => {},
-  ...others
+  config: {
+    ...others
+  }
 });
 
 ```
@@ -55,7 +57,7 @@ xhr({
 - **data**: `data`is the data to be sent as the request body
 - **success**: Callback after successful request and `xhr.success` intercept returns true
 - **error**: Callback after failed request or `xhr.success` intercept returns false
-- **others**: refer to [https://github.com/axios/axios#request-config](https://github.com/axios/axios#request-config)
+- **config**: refer to [https://github.com/axios/axios#request-config](https://github.com/axios/axios#request-config)
 
 ## API
 
