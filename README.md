@@ -23,13 +23,7 @@
 Using npm:
 
 ```npm
-npm install axhr
-```
-
-Using bower:
-
-```npm
-bower install axhr
+npm install axhr axios --save
 ```
 
 ## config
