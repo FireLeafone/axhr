@@ -7,6 +7,6 @@
 .com.apple.timemachine.supported
 node_modules
 build
-
+lib
 dist
 npm-debug.log*
