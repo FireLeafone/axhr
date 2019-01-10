@@ -88,11 +88,15 @@ export default function xhr (options) {
   if (config.headers['Content-Type'].indexOf('application/x-www-form-urlencoded') >= 0) {
     params = setData(params) || {};
   } else if (config.headers['Content-Type'].indexOf('multipart/form-data') >= 0) { // upload file
-    const formData = new FormData();
-    Object.keys(options.data).map(key => {
-      formData.append(key, options.data[key]);
-    });
-    params = formData;
+    if('append' in options.data) {
+      params = options.data;
+    } else {
+      const formData = new FormData();
+      Object.keys(options.data).map(key => {
+        formData.append(key, options.data[key]);
+      });
+      params = formData;
+    }
   }
 
   /**

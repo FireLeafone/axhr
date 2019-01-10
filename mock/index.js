@@ -63,6 +63,14 @@ const errXhr = () => {
   };
 };
 
+const fileXhr = () => {
+  return {
+    code: '000000',
+    message: 'file success'
+  };
+};
+
 Mock.mock(/\/api\/errXhr/, 'get', errXhr);
 Mock.mock(/\/api\/getUser/, 'get', getUser);
 Mock.mock(/\/api\/getUserByName/, 'post', getUserByName);
+Mock.mock(/\/api\/fileXhr/, 'post', fileXhr);

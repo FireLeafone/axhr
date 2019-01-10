@@ -42,4 +42,22 @@ describe('async xhr', () => {
       error: (res) => callback(res)
     });
   });
+  it('xhr FormData', done => {
+    function callback(data) {
+      expect(data.code).toBe('000000');
+      expect(data.message).toBe('file success');
+      done();
+    }
+    var formData = new FormData();
+    formData.append('userName', 'NARUTOne');
+    xhr({
+      type: 'post',
+      url: 'fileXhr',
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      },
+      data: formData,
+      success: (res) => callback(res)
+    });
+  });
 });
