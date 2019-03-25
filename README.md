@@ -35,7 +35,7 @@ xhr({
   headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
   baseUrl: 'https://some-domain.com/api/',
   data: {},
-  success: res => {},
+  success: (res, response) => {},
   error: res => {},
   config: {
     ...others
@@ -153,8 +153,7 @@ xhr.defaultConfig = {
   withCredentials: true
 };
 
-xhr.success = (response) => {
-  const res = response;
+xhr.success = (res, response) => {
   let isSuccess = true;
 
   if (typeof res !== 'object') {

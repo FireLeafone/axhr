@@ -164,17 +164,18 @@ export default function xhr (options) {
     /**
    * @public
    * @name xhr.success
+   * @param {object} response.data 当前response的data
    * @param {object} response 当前response
    * @description 实现动态 拦截配置
    * ```js
-   * xhr.success = res => boolean
+   * xhr.success = res, [response] => boolean
    * ```
    * @return {boolean}
    */
-    const isSuccess = xhr.success ? xhr.success(response.data) : true;
+    const isSuccess = xhr.success ? xhr.success(response.data, response) : true;
 
     if (isSuccess) {
-      return xhrsuccess ? xhrsuccess(response.data) : response.data;
+      return xhrsuccess ? xhrsuccess(response.data, response) : response.data;
     } else {
       const err = 'unknown error';
       // xhr.error && xhr.error(response.data);
