@@ -1,6 +1,6 @@
 {
   "name": "axhr",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "axios xhr",
   "main": "lib/index.js",
   "files": [
@@ -35,7 +35,8 @@
     ]
   },
   "dependencies": {
-    "axios": "^0.18.0"
+    "axios": "^0.18.0",
+    "lodash": "^4.17.11"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",

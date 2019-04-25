@@ -29,6 +29,7 @@
  */
 
 import axios from 'axios';
+import merge from 'lodash/merge';
 import {isObject, setData} from './utils';
 
 const server = axios;
@@ -88,8 +89,7 @@ export default function xhr (options) {
   let params = options.data || {};
 
   // 全局部分配置 xhr.defaultConfig = {}
-  config = Object.assign({}, config, xhr.defaultConfig || {}, options.config || {});
-
+  config = merge({}, config, xhr.defaultConfig || {}, options.config || {});
   // header
   if (options.headers) {
     config.headers = Object.assign({}, config.headers, options.headers);

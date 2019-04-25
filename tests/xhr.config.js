@@ -23,7 +23,10 @@ xhr.baseData = {
 };
 
 xhr.defaultConfig = {
-  timeout: 10000
+  timeout: 10000,
+  headers: {
+    ticket: 'xxx'
+  }
 };
 
 xhr.success = (response) => {
