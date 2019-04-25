@@ -32,9 +32,13 @@ import axios from 'axios';
 import {isObject, setData} from './utils';
 
 const server = axios;
+server.defaultSource = server.CancelToken.source();
 
 // request interceptors
 server.interceptors.request.use(function (config) {
+  if (config.cancelToken === undefined) {
+    config.cancelToken = axios.defaultSource.token;
+  }
   return config;
 }, function (err) {
   return Promise.reject(err);
@@ -64,6 +68,12 @@ server.interceptors.response.use(function (response) {
  * ```
  * @return {object}  return an object containing either "data" or "err"
  */
+
+// 取消请求
+xhr.cancelXhr = () => {
+  server.defaultSource.cancel('cancel request');
+  server.defaultSource = axios.CancelToken.source(); // 刷新 defaultSource
+};
 
 export default function xhr (options) {
   if (!options) return new Error('The options field is required, and the type is object, for XHR !');

@@ -70,6 +70,10 @@ const fileXhr = () => {
   };
 };
 
+Mock.setup({
+  timeout: 600
+});
+
 Mock.mock(/\/api\/errXhr/, 'get', errXhr);
 Mock.mock(/\/api\/getUser/, 'get', getUser);
 Mock.mock(/\/api\/getUserByName/, 'post', getUserByName);

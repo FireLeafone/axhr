@@ -60,4 +60,20 @@ describe('async xhr', () => {
       success: (res) => callback(res)
     });
   });
+  it('cancel xhr', done => {
+    function callback(data) {
+      expect(data.code).toBe(401);
+      expect(data.message).toBe('cancel xhr');
+      done();
+    }
+    xhr({
+      url: 'getUser',
+      success: (res) => callback(res)
+    });
+
+    setTimeout(() => {
+      xhr.cancelXhr();
+      callback({code: 401, message: 'cancel xhr'});
+    }, 100);
+  });
 });

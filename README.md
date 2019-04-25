@@ -53,6 +53,8 @@ xhr({
 - **error**: Callback after failed request or `xhr.success` intercept returns false
 - **config**: refer to [https://github.com/axios/axios#request-config](https://github.com/axios/axios#request-config)
 
+   * **cancelToken**：null, don't cancel request
+
 ## API
 
 ### xhr.defaultConfig
