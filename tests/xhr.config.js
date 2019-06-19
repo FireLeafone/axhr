@@ -54,4 +54,5 @@ xhr.success = (response) => {
 
 xhr.error = () => {
   new Error('The server strayed！');
+
 };
