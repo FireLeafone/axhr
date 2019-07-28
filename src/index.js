@@ -169,7 +169,6 @@ export default function xhr (options) {
 
   const xhrsuccess = options.success || null;
   const xhrerror = options.error || null;
-
   return server(config).then(response => {
     /**
    * @public

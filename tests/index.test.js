@@ -1,8 +1,11 @@
 import xhr from '../src/index';
-import "../mock/index";
 import './xhr.config';
+// import { setup, teardown } from './xhrMock';
 
-describe('async xhr', () => {
+describe('axios xhr', () => {
+  // beforeEach(() => setup());
+  // afterEach(() => teardown());
+
   it('default get config', done => {
     var mockFn = jest.fn();
     function callback(data) {
@@ -12,11 +15,13 @@ describe('async xhr', () => {
       expect(mockFn).toBeCalled();
       done();
     }
-    xhr({
+    const options = {
       url: 'getUser',
       success: (res) => callback(res)
-    });
-  }, 10000);
+    };
+
+    xhr(options);
+  }, 1000);
 
   it('post config', done => {
     var mockFn = jest.fn();
@@ -27,15 +32,17 @@ describe('async xhr', () => {
       expect(mockFn).toBeCalled();
       done();
     }
-    xhr({
+    const options = {
       type: 'post',
       url: 'getUserByName',
       data: {
         userName: 'NARUTOne'
       },
       success: (res) => callback(res)
-    });
-  }, 10000);
+    };
+
+    xhr(options);
+  }, 1000);
 
   it('xhr error', done => {
     var mockFn = jest.fn();
@@ -46,34 +53,38 @@ describe('async xhr', () => {
       expect(mockFn).toBeCalled();
       done();
     }
-    xhr({
+    const options = {
       type: 'GET',
       url: 'errXhr',
       error: (res) => callback(res)
-    });
-  }, 10000);
+    };
+    xhr(options);
+  }, 1000);
 
-  it('xhr FormData', done => {
-    var mockFn = jest.fn();
-    function callback(data) {
-      mockFn();
-      expect(data.code).toBe('000000');
-      expect(data.message).toBe('file success');
-      expect(mockFn).toBeCalled();
-      done();
-    }
-    var formData = new FormData();
-    formData.append('userName', 'NARUTOne');
-    xhr({
-      type: 'post',
-      url: 'fileXhr',
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      },
-      data: formData,
-      success: (res) => callback(res)
-    });
-  }, 10000);
+  // todo
+  // it('xhr FormData', done => {
+  //   var mockFn = jest.fn();
+  //   function callback(res) {
+  //     console.log(res);
+  //     mockFn();
+  //     expect(mockFn).toBeCalled();
+  //     done();
+  //   }
+  //   var formData = new FormData();
+  //   formData.append('userName', 'NARUTOne');
+  //   const options = {
+  //     type: 'post',
+  //     url: '',
+  //     baseUrl: "http://upload.com/",
+  //     headers: {
+  //       'Content-Type': 'multipart/form-data'
+  //     },
+  //     data: formData,
+  //     success: (res) => callback(res),
+  //     error: (err) => console.log(err)
+  //   };
+  //   xhr(options);
+  // });
 
   it('cancel xhr', done => {
     var mockFn = jest.fn();
@@ -83,17 +94,19 @@ describe('async xhr', () => {
       expect(mockFn).toBeCalledTimes(0);
       done();
     }
-    xhr({
+    const options = {
       url: 'getUser',
       success: (res) => {
         mockFn();
         callback(res);
       }
-    });
+    };
+
+    xhr(options);
 
     setTimeout(() => {
       xhr.cancelXhr();
       callback({code: 401, message: 'cancel xhr'});
-    }, 100);
-  }, 10000);
+    }, 0);
+  }, 1000);
 });

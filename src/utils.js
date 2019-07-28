@@ -35,6 +35,8 @@
 export const isObject = obj => Object.prototype.toString.call(obj) === '[object Object]';
 export const isArray = arr => Array.isArray(arr);
 
+export const DEFAULT_VALUE = {};
+
 export function setData (params) {
   let sendData = params;
   if (isObject(sendData)) {
@@ -47,7 +49,7 @@ export function setData (params) {
       return `${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
     }).join('&');
   } else {
-    return new Error('options.data is object type');
+    return DEFAULT_VALUE;
   }
   return sendData;
 }

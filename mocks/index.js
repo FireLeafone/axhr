@@ -17,19 +17,7 @@ const userMap = Mock.mock({
   }
 });
 
-/** 
- * @param {any} paramsString 
- * @returns 
- */
-function param2Obj (paramsString) {
-  const search = paramsString;
-  if (!search) {
-    return {};
-  }
-  return JSON.parse('{"' + decodeURIComponent(search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g, '":"') + '"}');
-}
-
-const getUser = () => {
+export const getUser = () => {
   return {
     code: 200,
     data: userMap.admin,
@@ -37,11 +25,10 @@ const getUser = () => {
   };
 };
 
-const getUserByName = config => {
-  const body = param2Obj(config.body);
-    const {userName} = body;
+export const getUserByName = params => {
+  const {userName} = params;
 
-  if (!body) {
+  if (!params) {
     return {
       code: 201,
       data: [],
@@ -56,25 +43,23 @@ const getUserByName = config => {
   };
 };
 
-const errXhr = () => {
+export const errXhr = () => {
   return {
     code: 300,
     message: 'xhr error'
   };
 };
 
-const fileXhr = () => {
+export const fileXhr = () => {
   return {
     code: '000000',
     message: 'file success'
   };
 };
 
-Mock.setup({
-  timeout: 600
-});
-
-Mock.mock(/\/api\/errXhr/, 'get', errXhr);
-Mock.mock(/\/api\/getUser/, 'get', getUser);
-Mock.mock(/\/api\/getUserByName/, 'post', getUserByName);
-Mock.mock(/\/api\/fileXhr/, 'post', fileXhr);
+export default {
+  '/api/errXhr/get': () => errXhr(),
+  '/api/getUser/get': () => getUser(),
+  '/api/getUserByName/post': (params) => getUserByName(params),
+  '/api/fileXhr/post': () => fileXhr(),
+};

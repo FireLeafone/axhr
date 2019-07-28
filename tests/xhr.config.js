@@ -1,7 +1,7 @@
 import xhr from '../src/index';
 
 let apiUrl = '';
-const apiBaseUrl = '/api/';
+const apiBaseUrl = 'https://easy-mock.com/mock/5d3d72c93754634e08f8aecd/axhr/';
 
 xhr.getUrl = option => {
   if (option.baseUrl) {
@@ -54,5 +54,4 @@ xhr.success = (response) => {
 
 xhr.error = () => {
   new Error('The server strayed！');
-
 };
