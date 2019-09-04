@@ -1,4 +1,4 @@
-import {isArray, isObject, setData, DEFAULT_VALUE} from '../src/utils';
+import { isArray, isObject, setData, DEFAULT_VALUE } from '../src/utils';
 
 describe('utils', () => {
   it('is array', () => {

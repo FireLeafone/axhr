@@ -1,6 +1,6 @@
 # axhr
 
-> XHR is configurable based on [axios](https://github.com/axios/axios) ⏲
+> XHR is configurable based on [axios](https://github.com/axios/axios) ⏲ 🚀
 
 ---
 
