@@ -120,6 +120,22 @@ xhr.success = res => boolean
 xhr.error = err => {}
 ```
 
+### xhr.before
+
+> Execute before request
+
+```js
+xhr.before = () => {}
+```
+
+### xhr.end
+
+> Execute end request
+
+```js
+xhr.end = () => {}
+```
+
 ## example
 
 ```js

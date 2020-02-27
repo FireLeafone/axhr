@@ -167,6 +167,14 @@ export default function xhr (options) {
     config.url = options.url;
   }
 
+  /**
+   * 请求前before
+   */
+
+  if (xhr.before) {
+    xhr.before();
+  }
+
   const xhrsuccess = options.success || null;
   const xhrerror = options.error || null;
   return server(config).then(response => {
@@ -182,6 +190,10 @@ export default function xhr (options) {
    * @return {boolean}
    */
     const isSuccess = xhr.success ? xhr.success(response.data, response) : true;
+
+    if (xhr.end) {
+      xhr.end();
+    }
 
     if (isSuccess) {
       return xhrsuccess ? xhrsuccess(response.data, response) : response.data;
@@ -203,6 +215,9 @@ export default function xhr (options) {
    */
 
     xhr.error && xhr.error(err);
+    if (xhr.end) {
+      xhr.end();
+    }
     return xhrerror ? xhrerror(err) : err;
   });
 }
