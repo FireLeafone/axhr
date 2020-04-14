@@ -120,6 +120,14 @@ xhr.success = res => boolean
 xhr.error = err => {}
 ```
 
+### xhr.cancelXhr
+
+> cancel request
+
+```js
+xhr.cancelXhr("cancel request");
+```
+
 ### xhr.before
 
 > Execute before request

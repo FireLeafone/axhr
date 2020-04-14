@@ -38,7 +38,7 @@ server.defaultSource = server.CancelToken.source();
 // request interceptors
 server.interceptors.request.use(function (config) {
   if (config.cancelToken === undefined) {
-    config.cancelToken = axios.defaultSource.token;
+    config.cancelToken = server.defaultSource.token;
   }
   return config;
 }, function (err) {
@@ -71,8 +71,8 @@ server.interceptors.response.use(function (response) {
  */
 
 // 取消请求
-xhr.cancelXhr = () => {
-  server.defaultSource.cancel('cancel request');
+xhr.cancelXhr = (msg) => {
+  server.defaultSource.cancel('cancel request ' + msg);
   server.defaultSource = axios.CancelToken.source(); // 刷新 defaultSource
 };
 
