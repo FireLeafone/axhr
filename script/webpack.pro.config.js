@@ -36,7 +36,11 @@ var baseConfig = {
   },
   plugins: [
     new webpack.NoEmitOnErrorsPlugin(), // 2.x以上；编译时出错，跳过，编译后保错
-  ]
+  ],
+  externals: {
+    axios: "axios",
+    lodash: "lodash"
+  }
 };
 
 module.exports = baseConfig;

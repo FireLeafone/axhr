@@ -1,6 +1,6 @@
 {
   "name": "axhr",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "axios xhr",
   "main": "lib/axhr.js",
   "files": [
