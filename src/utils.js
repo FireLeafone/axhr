@@ -29,11 +29,11 @@
  */
 
 /**
- * utils 
+ * utils
  */
 
 export const isObject = obj => Object.prototype.toString.call(obj) === '[object Object]';
-export const isArray = arr => Array.isArray(arr);
+export const isArray = arr => Object.prototype.toString.call(arr) === '[object Array]';
 
 export const DEFAULT_VALUE = {};
 
