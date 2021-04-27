@@ -3,6 +3,8 @@ import xhr from '../src/index';
 describe('base xhr', () => {
   it('base url config', done => {
     var mockFn = jest.fn();
+    var mockFn1 = jest.fn();
+    var mockFn2 = jest.fn();
     function callback(data) {
       mockFn();
       expect(data.code).toBe('000000');
@@ -22,5 +24,13 @@ describe('base xhr', () => {
     };
 
     xhr(options);
+    xhr.before = () => {
+      mockFn1();
+      expect(mockFn1).toBeCalled();
+    };
+    xhr.end = () => {
+      mockFn2();
+      expect(mockFn2).toBeCalled();
+    };
   }, 1000);
 });

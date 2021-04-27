@@ -7,7 +7,7 @@
  * @Last Modified: Thursday, 20th December 2018 2:27:00 pm
  * @Modified By: NARUTOne (wznaruto326@163.com/wznarutone326@gamil.com>)
  * -----
- * @Copyright <<projectCreationYear>> - 2018 bairong, bairong
+ * @Copyright <<projectCreationYear>> - 2018
  * @fighting: code is far away from bug with the animal protecting
  *  ┏┓      ┏┓
  *  ┏┛┻━━━┛┻┓
@@ -30,16 +30,31 @@
 
 import axios from 'axios';
 import merge from 'lodash/merge';
+import repeatXhr from './repeat';
 import {isObject, setData} from './utils';
 
 const server = axios;
 server.defaultSource = server.CancelToken.source();
+let cancelXhr = null;
 
 // request interceptors
 server.interceptors.request.use(function (config) {
   if (config.cancelToken === undefined) {
     config.cancelToken = server.defaultSource.token;
+  } else if (config.cancelToken) {
+    config.cancelToken = config.cancelToken || new server.CancelToken((cancel) => {
+      cancelXhr = cancel;
+    });
   }
+
+  if (config.noRepeat) {
+    const requestKey = repeatXhr.generateReqKey(config);
+    repeatXhr.removePendingRequest(requestKey);
+    if (!repeatXhr.has(requestKey)) {
+      repeatXhr.set(requestKey, cancelXhr);
+    }
+  }
+
   return config;
 }, function (err) {
   return Promise.reject(err);
@@ -47,8 +62,17 @@ server.interceptors.request.use(function (config) {
 
 // respone interceptors
 server.interceptors.response.use(function (response) {
+  const {config} = response;
+  if (config.noRepeat) {
+    repeatXhr.removePendingRequest(config); // 从pendingRequest对象中移除请求
+  }
   return response;
 }, function (err) {
+  const {config} = err;
+  if (config.noRepeat) {
+    repeatXhr.removePendingRequest(config); // 从pendingRequest对象中移除请求
+  }
+
   return Promise.reject(err);
 });
 
@@ -63,21 +87,31 @@ server.interceptors.response.use(function (response) {
  *    type: 'GET',
  *    baseUrl: 'http://', xhr实例的baseUrl
  *    data: {},
+ *    config: {}, axios request-config
+ *    noRepeat: false,
  *    success: res => {},
  *    error: error => {}
+ *
  * }
  * ```
  * @return {object}  return an object containing either "data" or "err"
  */
 
-// 取消请求
+// 主动取消请求 原理 xhr.abort()
 xhr.cancelXhr = (msg) => {
-  server.defaultSource.cancel('cancel request ' + msg);
-  server.defaultSource = axios.CancelToken.source(); // 刷新 defaultSource
+  if (cancelXhr) {
+    cancelXhr('cancel request ' + msg);
+  } else {
+    server.defaultSource.cancel('cancel request ' + msg);
+    server.defaultSource = server.CancelToken.source(); // 刷新 defaultSource
+  }
 };
 
 export default function xhr (options) {
-  if (!options) return new Error('The options field is required, and the type is object, for XHR !');
+  if (!options) {
+    console.error('The options field is required, and the type is object, for xhr !');
+    return;
+  }
 
   let config = {
     method: (options.type || 'GET').toUpperCase(),
@@ -151,7 +185,6 @@ export default function xhr (options) {
    */
   if (xhr.getUrl) {
     const {baseUrl, url} = xhr.getUrl(options);
-
     config.baseURL = baseUrl;
     config.url = url;
   } else {
@@ -170,7 +203,6 @@ export default function xhr (options) {
   /**
    * 请求前before
    */
-
   if (xhr.before) {
     xhr.before();
   }

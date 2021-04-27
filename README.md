@@ -48,11 +48,12 @@ xhr({
 - **type**: `type [required]` is the request method to be used when making the request, default `GET`
 - **header**: `header` are custom headers to be sent, default `'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'`
 - **baseUrl**: `baseURL` will be prepended to `url` unless `url` is absolute.
-- **data**: `data`is the data to be sent as the request body
+- **data**: `data` is the data to be sent as the request body
 - **success**: Callback after successful request and `xhr.success` intercept returns true
 - **error**: Callback after failed request or `xhr.success` intercept returns false
 - **config**: refer to [https://github.com/axios/axios#request-config](https://github.com/axios/axios#request-config)
-  -**cancelToken**：null, don't cancel request
+  - **cancelToken**：`false`, don't cancel request; can also set unique token
+  - **noRepeat**: `false`, can repeat request, custom prop;
 
 ## API
 

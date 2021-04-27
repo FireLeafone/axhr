@@ -1,6 +1,6 @@
 {
   "name": "axhr",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "axios xhr",
   "main": "lib/axhr.js",
   "files": [
@@ -29,8 +29,8 @@
   },
   "homepage": "https://github.com/FireLeafone/axhr#readme",
   "dependencies": {
-    "axios": "^0.19.2",
-    "lodash": "^4.17.19"
+    "axios": "^0.21.1",
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
     "@babel/core": "^7.10.5",
