@@ -18,6 +18,6 @@ module.exports = {
   ],
   testMatch: ["<rootDir>/tests/**/*.(spec|test).js"],
   transform: {
-    "^.+\\.js$": "babel-jest"
-  }  
+    "\\.[jt]sx?$": "babel-jest"
+  }
 };

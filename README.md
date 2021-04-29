@@ -53,9 +53,11 @@ xhr({
 - **error**: Callback after failed request or `xhr.success` intercept returns false
 - **config**: refer to [https://github.com/axios/axios#request-config](https://github.com/axios/axios#request-config)
   - **cancelToken**：`false`, don't cancel request; can also set unique token
-  - **noRepeat**: `false`, can repeat request, custom prop;
+  - **noRepeat**: `false`, can repeat request, custom prop, `cancelToken` isn't `false`；if `true` cancel before pending request
 
 ## API
+
+> global definition method
 
 ### xhr.defaultConfig
 
@@ -131,7 +133,7 @@ xhr.cancelXhr("cancel request");
 
 ### xhr.before
 
-> Execute before request
+> Execute before request，
 
 ```js
 xhr.before = () => {}

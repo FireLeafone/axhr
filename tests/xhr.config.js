@@ -1,7 +1,7 @@
 import xhr from '../src/index';
 
 let apiUrl = '';
-const apiBaseUrl = 'https://easy-mock.com/mock/5d3d72c93754634e08f8aecd/axhr/';
+const apiBaseUrl = '/api';
 
 xhr.getUrl = option => {
   if (option.baseUrl) {
@@ -29,29 +29,29 @@ xhr.defaultConfig = {
   }
 };
 
-xhr.success = (response) => {
-  const res = response;
+xhr.success = (res) => {
   let isSuccess = true;
 
+  if (typeof res === 'string') {
+    res = JSON.parse(res);
+  }
+
   if (typeof res !== 'object') {
-    new Error(apiUrl + ': response data should be JSON');
+    // console.error(apiUrl + ': response data should be JSON');
     isSuccess = false;
   }
   switch (res.code + '') {
-    case '000000':
-      isSuccess = true;
-      break;
     case '200':
       isSuccess = true;
       break;
     default:
-      new Error(res.message || 'unknown error');
+      // console.error(res.message || 'unknown error');
       isSuccess = false;
   }
 
   return isSuccess;
 };
 
-xhr.error = () => {
-  new Error('The server strayed！');
-};
+// xhr.error = () => {
+//   console.error('The server strayed！');
+// };

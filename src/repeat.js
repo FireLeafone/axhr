@@ -38,7 +38,7 @@ const repeatXhr = {
     try {
       const { method, url, params, data } = config;
       return [method, url, JSON.stringify(params), JSON.stringify(data)].join(
-        "&"
+        "!!"
       );
     } catch(err) {
       console.error(err);
@@ -48,8 +48,8 @@ const repeatXhr = {
     const requestKey = this.generateReqKey(config);
     if (this.has(requestKey)) {
       const cancel = this.get(requestKey);
-      cancel && cancel("cancel request " + requestKey);
       this.delete(requestKey);
+      cancel && cancel("cancel request " + requestKey);
     }
   }
 };

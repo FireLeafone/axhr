@@ -1,112 +1,388 @@
 import xhr from '../src/index';
 import './xhr.config';
-// import { setup, teardown } from './xhrMock';
+import { getAjaxRequest } from './helper'
 
-describe('axios xhr', () => {
-  // beforeEach(() => setup());
-  // afterEach(() => teardown());
+describe('xhr test', () => {
+  beforeEach(() => {
+    jasmine.Ajax.install()
+  })
 
-  it('default get config', done => {
-    var mockFn = jest.fn();
-    function callback(data) {
-      mockFn();
-      expect(data.code).toBe(200);
-      expect(data.message).toBe('get success');
-      expect(mockFn).toBeCalled();
+  afterEach(() => {
+    jasmine.Ajax.uninstall()
+  })
+
+  it('null config test', done => {
+    xhr().catch(err => {
+      expect(err).toBe('config is null')
       done();
+    });
+  });
+
+  it('base config and api call test', done => {
+    var response = null;
+    var mockSuccess = null;
+    var mockError = jest.fn();
+    var mockFn1 = null;
+    var mockFn2 = null;
+    function callback(ds, resp) {
+      response = resp;
+      mockSuccess = jest.fn(() => 1)();
+      expect(ds.data.foo).toBe('bar')
     }
-    const options = {
-      url: 'getUser',
-      success: (res) => callback(res)
+
+     // 注意执行顺序
+     xhr.before = () => {
+      mockFn1 = jest.fn(() => 3)();
     };
 
-    xhr(options);
-  }, 1000);
+    xhr.error = (err) => {
+      console.log(err)
+      mockError();
+    };
 
-  it('post config', done => {
-    var mockFn = jest.fn();
-    function callback(data) {
-      mockFn();
-      expect(data.code).toBe('000000');
-      expect(data.message).toBe('post success');
-      expect(mockFn).toBeCalled();
-      done();
-    }
+    xhr.end = () => {
+      mockFn2 = jest.fn(() => 4)();
+      expect(response.status).toBe(200)
+      expect(response.statusText).toBe('OK')
+      expect(response.headers['content-type']).toBe('application/json')
+      expect(mockSuccess).toBe(1);
+      expect(mockError).toHaveBeenCalledTimes(0);
+      expect(mockFn1).toBe(3);
+      expect(mockFn2).toBe(4);
+      done()
+    };
+
     const options = {
-      type: 'post',
-      url: 'getUserByName',
+      url: '/foo',
       data: {
-        userName: 'NARUTOne'
+        username: 'admin'
       },
-      success: (res) => callback(res)
-    };
-
-    xhr(options);
-  }, 1000);
-
-  it('xhr error', done => {
-    var mockFn = jest.fn();
-    function callback(data) {
-      mockFn();
-      expect(data.code).toBe(300);
-      expect(data.message).toBe('xhr error');
-      expect(mockFn).toBeCalled();
-      done();
-    }
-    const options = {
-      type: 'GET',
-      url: 'errXhr',
-      error: (res) => callback(res)
-    };
-    xhr(options);
-  }, 1000);
-
-  // todo
-  // it('xhr FormData', done => {
-  //   var mockFn = jest.fn();
-  //   function callback(res) {
-  //     console.log(res);
-  //     mockFn();
-  //     expect(mockFn).toBeCalled();
-  //     done();
-  //   }
-  //   var formData = new FormData();
-  //   formData.append('userName', 'NARUTOne');
-  //   const options = {
-  //     type: 'post',
-  //     url: '',
-  //     baseUrl: "http://upload.com/",
-  //     headers: {
-  //       'Content-Type': 'multipart/form-data'
-  //     },
-  //     data: formData,
-  //     success: (res) => callback(res),
-  //     error: (err) => console.log(err)
-  //   };
-  //   xhr(options);
-  // });
-
-  it('cancel xhr', done => {
-    var mockFn = jest.fn();
-    function callback(data) {
-      expect(data.code).toBe(401);
-      expect(data.message).toBe('cancel xhr');
-      expect(mockFn).toBeCalledTimes(0);
-      done();
-    }
-    const options = {
-      url: 'getUser',
-      success: (res) => {
-        mockFn();
-        callback(res);
+      success: (res, resp) => callback(res, resp),
+      error: (err) => {
+        mockError();
       }
     };
 
     xhr(options);
 
+    getAjaxRequest().then(request => {
+      // console.log(request.requestHeaders);
+      expect(request.url).toEqual(expect.stringContaining('/api/foo'))
+      expect(request.url).toEqual(expect.stringContaining('t='))
+      expect(request.url).toEqual(expect.stringContaining('username=admin'))
+      expect(request.method).toBe('GET')
+      // expect(request.requestHeaders['Content-Type']).toBe('application/json; charset=UTF-8')
+      expect(request.requestHeaders['ticket']).toBe('xxx')
+      request.respondWith({
+        status: 200,
+        statusText: 'OK',
+        responseText: '{"code": "200", "data": {"foo": "bar"}}',
+        responseHeaders: {
+          'Content-Type': 'application/json'
+        }
+      })
+    })
+  });
+
+  it('config props test', done => {
+    var mockFn = jest.fn();
+    var mockError = jest.fn();
+    function callback(ds) {
+      mockFn();
+      expect(ds.data.foo).toBe('bar')
+    }
+    const options = {
+      url: '/foo',
+      baseUrl: '/test',
+      type: 'POST',
+      data: {username: 'admin'},
+      headers: {'Content-Type': 'application/json; charset=UTF-8'},
+      config: {
+        timeout: 20000
+      },
+      success: (res) => callback(res),
+      error: () => {
+        mockError();
+      }
+    };
+
+    xhr.error = (err) => {
+      console.log(err)
+      mockError();
+    };
+    xhr.end = () => {
+      expect(mockFn).toHaveBeenCalled();
+      expect(mockError).toHaveBeenCalledTimes(0);
+      done();
+    }
+
+    xhr(options);
+    getAjaxRequest().then(request => {
+      const params = JSON.parse(request.params);
+      expect(request.url).toEqual(expect.stringContaining('/test/foo'))
+      expect(params['username']).toEqual('admin')
+      expect(request.method).toBe('POST')
+      expect(request.requestHeaders['Content-Type']).toBe('application/json; charset=UTF-8')
+      expect(request.requestHeaders['ticket']).toBe('xxx')
+      expect(request.timeout).toBe(20000)
+      request.respondWith({
+        status: 200,
+        statusText: 'OK',
+        responseText: '{"code": "200", "data": {"foo": "bar"}}',
+        responseHeaders: {
+          'Content-Type': 'application/json'
+        }
+      })
+    })
+  });
+
+  it('xhr code error', done => {
+    var mockSuccess = jest.fn();
+    var mockError = jest.fn();
+    const options = {
+      type: 'POST',
+      data: {username: 'admin'},
+      url: 'errXhr',
+      success: () => {
+        mockSuccess();
+      },
+      error: (err) => {
+        expect(err.message).toBe("code error")
+        mockError();
+      }
+    };
+
+    xhr.error = (err) => {
+      console.log(err)
+    };
+    xhr.end = () => {
+      expect(mockSuccess).toHaveBeenCalledTimes(0);
+      expect(mockError).toHaveBeenCalledTimes(1);
+      done();
+    }
+
+    xhr(options);
+
+    getAjaxRequest().then(request => {
+      request.respondWith({
+        status: 200,
+        statusText: 'OK',
+        responseText: '{"code": "300", "message": "code error"}',
+        responseHeaders: {
+          'Content-Type': 'application/json'
+        }
+      })
+    })
+  });
+
+  it('xhr server error', done => {
+    var mockSuccess = jest.fn();
+    var mockError = jest.fn();
+    var mockError2 = jest.fn();
+    const options = {
+      type: 'GET',
+      url: 'errXhr',
+      success: () => {
+        mockSuccess();
+      },
+      error: (err) => {
+        mockError();
+      }
+    };
+
+    xhr.error = (err) => {
+      // console.log(err)
+      expect(err.response.status).toBe(500)
+      mockError2();
+    };
+    xhr.end = () => {
+      expect(mockSuccess).toHaveBeenCalledTimes(0);
+      expect(mockError).toHaveBeenCalledTimes(1);
+      expect(mockError2).toHaveBeenCalledTimes(1);
+      done();
+    }
+
+    xhr(options);
+
+    getAjaxRequest().then(request => {
+      request.respondWith({
+        status: 500,
+      })
+    })
+  });
+
+  it('xhr FormData', done => {
+    var mockFn = jest.fn();
+    var mockError = jest.fn();
+    function callback(ds) {
+      mockFn();
+      expect(ds.data.foo).toBe('bar')
+    }
+    const options = {
+      type: 'POST',
+      baseUrl: '/test',
+      url: '/upload',
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      },
+      config: {
+        timeout: 30000
+      },
+      data: {username: 'admin'},
+      success: (res) => callback(res),
+      error: () => {
+        mockError();
+      }
+    };
+
+    xhr.error = (err) => {
+      console.log(err)
+      mockError();
+    };
+    xhr.end = () => {
+      expect(mockFn).toHaveBeenCalled();
+      expect(mockError).toHaveBeenCalledTimes(0);
+      done();
+    }
+
+    xhr(options);
+
+    getAjaxRequest().then(request => {
+      // console.log(request.requestHeaders)
+      const params = request.params;
+      expect(request.url).toEqual(expect.stringContaining('/test/upload'))
+      expect(params.get('username')).toEqual('admin')
+      expect(request.method).toBe('POST')
+      // expect(request.requestHeaders['Content-Type']).toBe('multipart/form-data')
+      expect(request.requestHeaders['ticket']).toBe('xxx')
+      expect(request.timeout).toBe(30000)
+      request.respondWith({
+        status: 200,
+        statusText: 'OK',
+        responseText: '{"code": "200", "data": {"foo": "bar"}}',
+        responseHeaders: {
+          'Content-Type': 'application/json'
+        }
+      })
+    })
+  });
+
+  it('handle cancel xhr', done => {
+    var mockFn = jest.fn();
+    var mockError = jest.fn();
+    const options = {
+      url: '/foo',
+      success: () => {
+        mockFn();
+      },
+      error: () => {
+        mockError();
+      }
+    };
+
+    xhr.error = (err) => {
+      expect(err.message).toBe('cancel request /foo')
+      mockError();
+    };
+    xhr.end = () => {
+      expect(mockFn).not.toHaveBeenCalled();
+      expect(mockError).toHaveBeenCalledTimes(2);
+      done();
+    }
+
+    xhr(options);
+
+    getAjaxRequest().then(request => {
+      expect(request.url).toEqual(expect.stringContaining('/api/foo'))
+      expect(request.method).toBe('GET')
+      expect(request.requestHeaders['ticket']).toBe('xxx')
+      expect(request.timeout).toBe(10000)
+      setTimeout(() => {
+        request.respondWith({
+          status: 200,
+          statusText: 'OK',
+          responseText: '{"code": "200", "data": {"foo": "bar"}}',
+          responseHeaders: {
+            'Content-Type': 'application/json'
+          }
+        })
+      }, 300)
+      xhr.cancelXhr('/foo');
+    })
+  });
+
+  it('repeat cancel xhr', done => {
+    var mockFn = jest.fn();
+    var mockError = jest.fn();
+    var isRepeat = false;
+    const options = {
+      url: '/foo',
+      config: {
+        noRepeat: true,
+        cancelToken: true
+      },
+      success: () => {
+        mockFn();
+      },
+      error: () => {
+        mockError();
+      }
+    };
+
+    xhr.error = (err) => {
+      mockError();
+      expect(err.message).toEqual(expect.stringContaining('cancel request'))
+      expect(err.message).toEqual(expect.stringContaining('get!!/foo!!'))
+    };
+    xhr.end = () => {
+      if (isRepeat) {
+        expect(mockFn).toHaveBeenCalledTimes(1);
+        expect(mockError).toHaveBeenCalledTimes(2);
+        done()
+      }
+      isRepeat = !isRepeat;
+    }
+
+    xhr.getUrl = null;
+
+    xhr(options);
+
+    getAjaxRequest().then(request => {
+      expect(request.url).toEqual(expect.stringContaining('/foo'))
+      expect(request.method).toBe('GET')
+      expect(request.requestHeaders['ticket']).toBe('xxx')
+      expect(request.timeout).toBe(10000)
+      // 第一次请求延迟1s
+      setTimeout(() => {
+        request.respondWith({
+          status: 200,
+          statusText: 'OK',
+          responseText: '{"code": "200", "data": {"foo": "bar"}}',
+          responseHeaders: {
+            'Content-Type': 'application/json'
+          }
+        })
+      }, 1000)
+    })
+
     setTimeout(() => {
-      xhr.cancelXhr();
-      callback({code: 401, message: 'cancel xhr'});
-    }, 0);
-  }, 1000);
+      xhr(options);
+
+      getAjaxRequest().then(request => {
+        expect(request.url).toEqual(expect.stringContaining('/foo'))
+        expect(request.method).toBe('GET')
+        expect(request.requestHeaders['ticket']).toBe('xxx')
+        expect(request.timeout).toBe(10000)
+        request.respondWith({
+          status: 200,
+          statusText: 'OK',
+          responseText: '{"code": "200", "data": {"foo": "bar"}}',
+          responseHeaders: {
+            'Content-Type': 'application/json'
+          }
+        })
+      })
+
+    }, 100)
+  });
 });

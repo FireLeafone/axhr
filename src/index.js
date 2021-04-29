@@ -42,15 +42,16 @@ server.interceptors.request.use(function (config) {
   if (config.cancelToken === undefined) {
     config.cancelToken = server.defaultSource.token;
   } else if (config.cancelToken) {
-    config.cancelToken = config.cancelToken || new server.CancelToken((cancel) => {
+    config.cancelToken = new server.CancelToken((cancel) => {
       cancelXhr = cancel;
     });
   }
 
-  if (config.noRepeat) {
+  if (config.noRepeat && config.cancelToken) {
     const requestKey = repeatXhr.generateReqKey(config);
-    repeatXhr.removePendingRequest(requestKey);
-    if (!repeatXhr.has(requestKey)) {
+    repeatXhr.removePendingRequest(config);
+    const bol = repeatXhr.has(requestKey);
+    if (!bol) {
       repeatXhr.set(requestKey, cancelXhr);
     }
   }
@@ -69,7 +70,7 @@ server.interceptors.response.use(function (response) {
   return response;
 }, function (err) {
   const {config} = err;
-  if (config.noRepeat) {
+  if (config && config.noRepeat) {
     repeatXhr.removePendingRequest(config); // 从pendingRequest对象中移除请求
   }
 
@@ -109,8 +110,10 @@ xhr.cancelXhr = (msg) => {
 
 export default function xhr (options) {
   if (!options) {
-    console.error('The options field is required, and the type is object, for xhr !');
-    return;
+    if (process.env.NODE_ENV === 'development') {
+      console.error('The options field is required, and the type is object, for xhr !');
+    }
+    return Promise.reject('config is null');
   }
 
   let config = {
@@ -126,7 +129,7 @@ export default function xhr (options) {
   config = merge({}, config, xhr.defaultConfig || {}, options.config || {});
   // header
   if (options.headers) {
-    config.headers = Object.assign({}, config.headers, options.headers);
+    config.headers = merge({}, config.headers, options.headers);
   }
 
   if (config.headers['Content-Type'].indexOf('application/x-www-form-urlencoded') >= 0) {
@@ -209,6 +212,9 @@ export default function xhr (options) {
 
   const xhrsuccess = options.success || null;
   const xhrerror = options.error || null;
+
+  // console.log(config);
+
   return server(config).then(response => {
     /**
    * @public
@@ -222,18 +228,20 @@ export default function xhr (options) {
    * @return {boolean}
    */
     const isSuccess = xhr.success ? xhr.success(response.data, response) : true;
+    let result = null;
+    if (isSuccess) {
+      result =  xhrsuccess ? xhrsuccess(response.data, response) : response.data;
+    } else {
+      const err = 'unknown error';
+      // xhr.error && xhr.error(response.data);
+      result = xhrerror ? xhrerror(response.data) : err;
+    }
 
     if (xhr.end) {
       xhr.end();
     }
 
-    if (isSuccess) {
-      return xhrsuccess ? xhrsuccess(response.data, response) : response.data;
-    } else {
-      const err = 'unknown error';
-      // xhr.error && xhr.error(response.data);
-      return xhrerror ? xhrerror(response.data) : err;
-    }
+    return result;
   }).catch(err => {
     /**
    * @public
@@ -243,13 +251,14 @@ export default function xhr (options) {
    * ```js
    * xhr.error = res => boolean
    * ```
-   * @return {boolean}
+   * @return
    */
 
     xhr.error && xhr.error(err);
+    const result = xhrerror ? xhrerror(err) : err;
     if (xhr.end) {
       xhr.end();
     }
-    return xhrerror ? xhrerror(err) : err;
+    return result;
   });
 }
