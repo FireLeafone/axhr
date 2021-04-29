@@ -1,6 +1,6 @@
 # axhr
 
-> XHR is configurable based on [axios](https://github.com/axios/axios) ⏲ 🚀
+> XHR 配置化请求库 基于 [axios](https://github.com/axios/axios) ⏲ 🚀
 
 ---
 
@@ -17,8 +17,6 @@
 [download-img]: https://img.shields.io/npm/dm/axhr.svg
 [travis-url]: https://travis-ci.org/FireLeafone/axhr
 [travis-img]: https://travis-ci.org/FireLeafone/axhr.svg?branch=master
-
-[中文文档](./README-ZH.md)
 
 ## Installing
 
@@ -47,24 +45,24 @@ xhr({
 
 ```
 
-- **url**: `url [required]` is the server URL that will be used for the request
-- **type**: `type [required]` is the request method to be used when making the request, default `GET`
-- **header**: `header` are custom headers to be sent, default `'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'`
-- **baseUrl**: `baseURL` will be prepended to `url` unless `url` is absolute.
-- **data**: `data` is the data to be sent as the request body
-- **success**: Callback after successful request and `xhr.success` intercept returns true
-- **error**: Callback after failed request or `xhr.success` intercept returns false
-- **config**: refer to [https://github.com/axios/axios#request-config](https://github.com/axios/axios#request-config)
-  - **cancelToken**：`false`, don't cancel request; can also set unique token
-  - **noRepeat**: `false`, can repeat request, custom prop, `cancelToken` isn't `false`；if `true` cancel before pending request
+- **url**: `url [required]` 请求接口服务地址
+- **type**: `type [required]` 请求方式, 默认 `GET`
+- **header**: `header` 自定义请求头, 默认 `'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'`
+- **baseUrl**: `baseURL`基础地址， 除非`url`是绝对地址，否则会加在`url`前面
+- **data**: `data` 请求体参数，会根据配置自动转`params`或`data`
+- **success**: 请求成功响应， 使用`xhr.success` 拦截需要返回 `true`
+- **error**: 请求失败响应 或 `xhr.success` 拦截返回 `false`
+- **config**: 请求配置项，详情见[https://github.com/axios/axios#request-config](https://github.com/axios/axios#request-config)
+  - **cancelToken**：`false`, 默认当前请求不参与取消请求; 也可以设置`true`，独立token
+  - **noRepeat**: `false`, 默认不判断重复请求, `cancelToken` 必须是 `true` 将会取消还未响应结束的上一个重复请求
 
 ## API
 
-> global definition method
+> 搭配一些全局定义方法进行全局配置，对所有请求管用
 
 ### xhr.defaultConfig
 
-> Global configuration, will merge to `config`
+> 全局默认配置, 将会合并进 `config`
 
 ```js
 xhr.defaultConfig = {
@@ -75,7 +73,7 @@ xhr.defaultConfig = {
 
 ### xhr.baseData
 
-> Global basic params, will merge to `config.data`
+> 全局基础参数, 将会合并进 `config.data`
 
 ```js
 xhr.baseData = {
@@ -85,11 +83,11 @@ xhr.baseData = {
 
 ## xhr.baseUrl
 
-> global baseUrl, Priority less than `xhr.getUrl`
+> 全局定义`baseUrl` 优先级低于 `xhr.getUrl`
 
 ### xhr.getUrl
 
-> Implementing dynamic url, @params{config}
+> 全局动态设置获取`url`, `baseUrl`
 
 ```js
 const apiBaseUrl = '/oapi';
@@ -110,17 +108,36 @@ xhr.getUrl = option => {
 
 ### xhr.success
 
-> Implement dynamic interception configuration when the request is successful
-
-You can do some global logic
+> 当请求成功时实现动态拦截配置, 也可以在这块做一些接口数据返回初步逻辑拦截
 
 ```js
-xhr.success = res => boolean
+xhr.success = (res, resp) => {
+  let isSuccess = true;
+
+  if (typeof res === 'string') {
+    res = JSON.parse(res);
+  }
+
+  if (typeof res !== 'object') {
+    // console.error(apiUrl + ': response data should be JSON');
+    isSuccess = false;
+  }
+  switch (res.code + '') {
+    case '200':
+      isSuccess = true;
+      break;
+    default:
+      // console.error(res.message || 'unknown error');
+      isSuccess = false;
+  }
+
+  return isSuccess;
+}
 ```
 
 ### xhr.error
 
-> Implement dynamic interception configuration when the request is failed
+> 当请求失败时实现动态拦截配置,
 
 ```js
 xhr.error = err => {}
@@ -128,7 +145,7 @@ xhr.error = err => {}
 
 ### xhr.cancelXhr
 
-> cancel request
+> 手动调用取消请求，并传递取消信息
 
 ```js
 xhr.cancelXhr("cancel request");
@@ -136,7 +153,7 @@ xhr.cancelXhr("cancel request");
 
 ### xhr.before
 
-> Execute before request，
+> 请求前执行
 
 ```js
 xhr.before = () => {}
@@ -144,13 +161,15 @@ xhr.before = () => {}
 
 ### xhr.end
 
-> Execute end request
+> 请求后执行
 
 ```js
 xhr.end = () => {}
 ```
 
 ## example
+
+> 简单示例
 
 ```js
 import xhr from 'axhr';
