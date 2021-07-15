@@ -2,7 +2,7 @@
 const nodeResolve = require('@rollup/plugin-node-resolve').default; // 处理npm依赖
 const babel = require('@rollup/plugin-babel').default; // 配合babel, 处理新特性兼容
 const commonjs = require('@rollup/plugin-commonjs'); // 处理 CommonJS 转换成 ES2015 模块
-const reslint = require('rollup-plugin-eslint');
+const reslint = require('@rollup/plugin-eslint');
 const rterser = require('rollup-plugin-terser');
 
 const path = require("path");
