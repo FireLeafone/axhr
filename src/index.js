@@ -212,6 +212,8 @@ export default function xhr (options) {
 
   const xhrsuccess = options.success || null;
   const xhrerror = options.error || null;
+  const xhrcancel = options.cancel || null;
+  const cancelMsg = options.cancelMsg || '';
 
   // console.log(config);
 
@@ -238,7 +240,7 @@ export default function xhr (options) {
     }
 
     if (xhr.end) {
-      xhr.end();
+      xhr.end(result);
     }
 
     return result;
@@ -254,10 +256,17 @@ export default function xhr (options) {
    * @return
    */
 
-    xhr.error && xhr.error(err);
-    const result = xhrerror ? xhrerror(err) : err;
+    // 触发取消请求回调
+    if (axios.isCancel(err)) {
+      xhrcancel && xhrcancel(err);
+      xhr.error && xhr.error(cancelMsg || err.message, true);
+    } else {
+      xhr.error && xhr.error(err);
+    }
+
+    const result = xhrerror ? xhrerror(err) || err : err;
     if (xhr.end) {
-      xhr.end();
+      xhr.end(result);
     }
     return result;
   });

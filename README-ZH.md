@@ -36,11 +36,13 @@ xhr({
   headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
   baseUrl: 'https://some-domain.com/api/',
   data: {},
-  success: (res, response) => {},
-  error: res => {},
   config: {
     ...others
-  }
+  },
+  cancelMsg: '',
+  success: (res, response) => {},
+  error: res => {},
+  cancel: err => {},  
 });
 
 ```
@@ -52,6 +54,8 @@ xhr({
 - **data**: `data` 请求体参数，会根据配置自动转`params`或`data`
 - **success**: 请求成功响应， 使用`xhr.success` 拦截需要返回 `true`
 - **error**: 请求失败响应 或 `xhr.success` 拦截返回 `false`
+- **cancel**: 取消请求响应
+- **cancelMsg**: 取消请求提示信息
 - **config**: 请求配置项，详情见[https://github.com/axios/axios#request-config](https://github.com/axios/axios#request-config)
   - **cancelToken**：`false`, 默认当前请求不参与取消请求; 也可以设置`true`，独立token
   - **noRepeat**: `false`, 默认不判断重复请求, `cancelToken` 必须是 `true` 将会取消还未响应结束的上一个重复请求
@@ -140,7 +144,7 @@ xhr.success = (res, resp) => {
 > 当请求失败时实现动态拦截配置,
 
 ```js
-xhr.error = err => {}
+xhr.error = (err, [isCancel]) => {}
 ```
 
 ### xhr.cancelXhr
@@ -164,7 +168,7 @@ xhr.before = () => {}
 > 请求后执行
 
 ```js
-xhr.end = () => {}
+xhr.end = (res) => {}
 ```
 
 ## example

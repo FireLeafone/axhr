@@ -38,11 +38,13 @@ xhr({
   headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
   baseUrl: 'https://some-domain.com/api/',
   data: {},
-  success: (res, response) => {},
-  error: res => {},
   config: {
     ...others
-  }
+  },
+  cancelMsg: '',
+  success: (res, response) => {},
+  error: res => {},
+  cancel: err => {},  
 });
 
 ```
@@ -54,6 +56,8 @@ xhr({
 - **data**: `data` is the data to be sent as the request body
 - **success**: Callback after successful request and `xhr.success` intercept returns true
 - **error**: Callback after failed request or `xhr.success` intercept returns false
+- **cancel**: Callback after cancel request
+- **cancelMsg**: cancel request message
 - **config**: refer to [https://github.com/axios/axios#request-config](https://github.com/axios/axios#request-config)
   - **cancelToken**：`false`, don't cancel request; can also set unique token
   - **noRepeat**: `false`, can repeat request, custom prop, `cancelToken` isn't `false`；if `true` cancel before pending request
@@ -123,7 +127,7 @@ xhr.success = res => boolean
 > Implement dynamic interception configuration when the request is failed
 
 ```js
-xhr.error = err => {}
+xhr.error = (err, [isCancel]) => {}
 ```
 
 ### xhr.cancelXhr
@@ -147,7 +151,7 @@ xhr.before = () => {}
 > Execute end request
 
 ```js
-xhr.end = () => {}
+xhr.end = (res) => {}
 ```
 
 ## example

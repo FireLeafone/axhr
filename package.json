@@ -1,6 +1,6 @@
 {
   "name": "axhr",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "axios xhr",
   "main": "lib/axhr.js",
   "files": [
@@ -10,8 +10,7 @@
     "test": "jest --no-cache",
     "lint": "eslint --fix --ext .js src",
     "build": "node script/build.js",
-    "release": "npm run lint && npm run test && npm run build && npm publish",
-    "version": "npm version patch"
+    "release": "npm run lint && npm run test && npm run build && npm publish"
   },
   "repository": {
     "type": "git",
