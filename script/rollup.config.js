@@ -1,6 +1,6 @@
 // rollup.config.js
 const nodeResolve = require('@rollup/plugin-node-resolve').default; // 处理npm依赖
-const babel = require('@rollup/plugin-babel').default; // 配合babel, 处理新特性兼容
+// const babel = require('@rollup/plugin-babel').default; // 配合babel, 处理新特性兼容
 const commonjs = require('@rollup/plugin-commonjs'); // 处理 CommonJS 转换成 ES2015 模块
 const eslint = require('@rollup/plugin-eslint');
 const rterser = require('rollup-plugin-terser');
@@ -37,10 +37,10 @@ module.exports = {
       },
     }),
     commonjs(),
-    babel({
-      babelHelpers: 'runtime',
-      exclude: 'node_modules/**', // 防止打包node_modules下的文件
-    })
+    // babel({
+    //   babelHelpers: 'runtime',
+    //   exclude: 'node_modules/**', // 防止打包node_modules下的文件
+    // })
   ],
   // 指出应将哪些模块视为外部模块
   // external: ['lodash']
