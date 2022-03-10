@@ -4,10 +4,12 @@ import { getAjaxRequest } from './helper';
 
 describe('xhr test', () => {
   beforeEach(() => {
+    jest.setTimeout(10000);
     jasmine.Ajax.install();
   });
 
   afterEach(() => {
+    jest.clearAllTimers();
     jasmine.Ajax.uninstall();
   });
 
@@ -64,7 +66,6 @@ describe('xhr test', () => {
     };
 
     xhr(options);
-
     getAjaxRequest().then(request => {
       // console.log(request.requestHeaders);
       expect(request.url).toEqual(expect.stringContaining('/api/foo'));
@@ -162,7 +163,6 @@ describe('xhr test', () => {
     };
 
     xhr(options);
-
     getAjaxRequest().then(request => {
       request.respondWith({
         status: 200,
@@ -203,7 +203,6 @@ describe('xhr test', () => {
     };
 
     xhr(options);
-
     getAjaxRequest().then(request => {
       request.respondWith({
         status: 500,
@@ -246,7 +245,6 @@ describe('xhr test', () => {
     };
 
     xhr(options);
-
     getAjaxRequest().then(request => {
       // console.log(request.requestHeaders)
       const params = request.params;
@@ -271,9 +269,29 @@ describe('xhr test', () => {
     var mockFn = jest.fn();
     var mockError = jest.fn();
     var mockCancel = jest.fn();
+    var cancelTime = 0;
     const options = {
       url: '/foo',
       cancelMsg: 'cancel /foo',
+      config: {
+        cancelToken: true
+      },
+      success: () => {
+        mockFn();
+      },
+      error: () => {
+        mockError();
+      },
+      cancel: () => {
+        mockCancel();
+      }
+    };
+    const options2 = {
+      url: '/foo2',
+      cancelMsg: 'cancel /foo2',
+      config: {
+        cancelToken: true
+      },
       success: () => {
         mockFn();
       },
@@ -286,19 +304,25 @@ describe('xhr test', () => {
     };
 
     xhr.error = (err, isCancel) => {
-      expect(err).toBe('cancel /foo');
+      cancelTime += 1;
+      if (cancelTime === 1) {
+        expect(err).toBe('cancel /foo');
+      } else if (cancelTime === 2) {
+        expect(err).toBe('cancel /foo2');
+      }
       expect(isCancel).toBe(true);
       mockError();
     };
     xhr.end = () => {
-      expect(mockFn).not.toHaveBeenCalled();
-      expect(mockError).toHaveBeenCalledTimes(2);
-      expect(mockCancel).toHaveBeenCalledTimes(1);
-      done();
+      if (cancelTime === 2) {
+        expect(mockFn).not.toHaveBeenCalled();
+        expect(mockError).toHaveBeenCalledTimes(4);
+        expect(mockCancel).toHaveBeenCalledTimes(2);
+        done();
+      }
     };
 
     xhr(options);
-
     getAjaxRequest().then(request => {
       expect(request.url).toEqual(expect.stringContaining('/api/foo'));
       expect(request.method).toBe('GET');
@@ -313,9 +337,30 @@ describe('xhr test', () => {
             'Content-Type': 'application/json'
           }
         });
-      }, 300);
-      xhr.cancelXhr('/foo');
+      }, 1000);
+      xhr.cancelXhr('/foo', ['/foo']);
     });
+
+    setTimeout(() => {
+      xhr(options2);
+      getAjaxRequest().then(request => {
+        expect(request.url).toEqual(expect.stringContaining('/api/foo2'));
+        expect(request.method).toBe('GET');
+        expect(request.requestHeaders['ticket']).toBe('xxx');
+        expect(request.timeout).toBe(10000);
+        setTimeout(() => {
+          request.respondWith({
+            status: 200,
+            statusText: 'OK',
+            responseText: '{"code": "200", "data": {"foo": "bar"}}',
+            responseHeaders: {
+              'Content-Type': 'application/json'
+            }
+          });
+        }, 1000);
+        xhr.cancelXhr('/foo2');
+      });
+    }, 100);
   });
 
   it('repeat cancel xhr', done => {
@@ -353,7 +398,6 @@ describe('xhr test', () => {
     xhr.getUrl = null;
 
     xhr(options);
-
     getAjaxRequest().then(request => {
       expect(request.url).toEqual(expect.stringContaining('/foo'));
       expect(request.method).toBe('GET');
@@ -374,7 +418,6 @@ describe('xhr test', () => {
 
     setTimeout(() => {
       xhr(options);
-
       getAjaxRequest().then(request => {
         expect(request.url).toEqual(expect.stringContaining('/foo'));
         expect(request.method).toBe('GET');
@@ -389,7 +432,6 @@ describe('xhr test', () => {
           }
         });
       });
-
     }, 100);
   });
 });

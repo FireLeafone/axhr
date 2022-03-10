@@ -1,17 +1,14 @@
 import xhr from '../src/index';
 
-let apiUrl = '';
 const apiBaseUrl = '/api';
 
 xhr.getUrl = option => {
   if (option.baseUrl) {
-    apiUrl = option.baseUrl + option.url;
     return {
       baseUrl: option.baseUrl,
       url: option.url
     };
   }
-  apiUrl = apiBaseUrl + option.url;
   return {
     baseUrl: apiBaseUrl,
     url: option.url

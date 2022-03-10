@@ -134,8 +134,10 @@ xhr.error = (err, [isCancel]) => {}
 
 > cancel request
 
+Can specify a URL to cancel some request; no hanve urls, all requests will be cancelled
+
 ```js
-xhr.cancelXhr("cancel request");
+xhr.cancelXhr(message, urls?: []);
 ```
 
 ### xhr.before

@@ -9,5 +9,6 @@ node_modules
 build
 lib
 dist
+coverage
 npm-debug.log*
 package-lock.json

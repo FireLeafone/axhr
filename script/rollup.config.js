@@ -43,6 +43,5 @@ module.exports = {
     // })
   ],
   // 指出应将哪些模块视为外部模块
-  // external: ['lodash']
-  external: id => /lodash|axios/.test(id), // 处理 `import _merge from 'lodash/merge';`
+  external: id => /lodash|axios/.test(id),
 };

@@ -35,15 +35,17 @@ import {isObject, setData} from './utils';
 
 const server = axios;
 server.defaultSource = server.CancelToken.source();
-let cancelXhr = null;
+let cancelXhrs = [];
 
 // request interceptors
 server.interceptors.request.use(function (config) {
+  let cancelR = null;
   if (config.cancelToken === undefined) {
-    config.cancelToken = server.defaultSource.token;
+    config.cancelToken = server.defaultSource.token; // 默认使用统一的取消标识，统一取消
   } else if (config.cancelToken) {
     config.cancelToken = new server.CancelToken((cancel) => {
-      cancelXhr = cancel;
+      cancelXhrs.push({url: config.url, cancel});
+      cancelR = cancel;
     });
   }
 
@@ -52,7 +54,7 @@ server.interceptors.request.use(function (config) {
     repeatXhr.removePendingRequest(config);
     const bol = repeatXhr.has(requestKey);
     if (!bol) {
-      repeatXhr.set(requestKey, cancelXhr);
+      repeatXhr.set(requestKey, cancelR);
     }
   }
 
@@ -98,11 +100,25 @@ server.interceptors.response.use(function (response) {
  * @return {object}  return an object containing either "data" or "err"
  */
 
-// 主动取消请求 原理 xhr.abort()
-xhr.cancelXhr = (msg) => {
-  if (cancelXhr) {
-    cancelXhr('cancel request ' + msg);
-  } else {
+// 主动取消请求 原理 xhr.abort(), 可以指定url取消
+xhr.cancelXhr = (msg, urls = []) => {
+  if (cancelXhrs.length) {
+    if (urls && urls.length) {
+      cancelXhrs = cancelXhrs.filter(c => {
+        if (urls.includes(c.url)) {
+          c.cancel('cancel request ' + msg);
+          return false;
+        }
+        return true;
+      });
+    } else {
+      cancelXhrs.forEach(c => c.cancel('cancel request ' + msg));
+      cancelXhrs = []; // 重置
+    }
+  }
+
+  // 同时取消统一标识的请求
+  if (!urls || !urls.length) {
     server.defaultSource.cancel('cancel request ' + msg);
     server.defaultSource = server.CancelToken.source(); // 刷新 defaultSource
   }
@@ -214,6 +230,7 @@ export default function xhr (options) {
   const xhrerror = options.error || null;
   const xhrcancel = options.cancel || null;
   const cancelMsg = options.cancelMsg || '';
+  const configUrl = config.url;
 
   // console.log(config);
 
@@ -259,6 +276,7 @@ export default function xhr (options) {
     // 触发取消请求回调
     if (axios.isCancel(err)) {
       xhrcancel && xhrcancel(err);
+      // console.log(cancelMsg, err.message);
       xhr.error && xhr.error(cancelMsg || err.message, true);
     } else {
       xhr.error && xhr.error(err);
@@ -269,5 +287,9 @@ export default function xhr (options) {
       xhr.end(result);
     }
     return result;
+  }).finally(() => {
+    // 移除第一个匹配值
+    const index = cancelXhrs.findIndex(c => c.url === configUrl);
+    cancelXhrs.splice(index, 1);
   });
 }

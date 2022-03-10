@@ -151,8 +151,10 @@ xhr.error = (err, [isCancel]) => {}
 
 > 手动调用取消请求，并传递取消信息
 
+可以指定urls取消；不传urls则取消所有请求
+
 ```js
-xhr.cancelXhr("cancel request");
+xhr.cancelXhr(message, urls?: []);
 ```
 
 ### xhr.before
