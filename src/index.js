@@ -148,9 +148,8 @@ export default function xhr (options) {
     config.headers = merge({}, config.headers, options.headers);
   }
 
-  if (config.headers['Content-Type'].indexOf('application/x-www-form-urlencoded') >= 0) {
-    params = setData(params) || {};
-  } else if (config.headers['Content-Type'].indexOf('multipart/form-data') >= 0) { // upload file
+  // 处理文件参数 upload file
+  if (config.headers['Content-Type'].indexOf('multipart/form-data') >= 0) {
     if('append' in options.data) {
       params = options.data;
     } else {
@@ -174,7 +173,8 @@ export default function xhr (options) {
       Object.keys(xhr.baseData).map(key => {
         params.append(key, xhr.baseData[key]);
       });
-    } else {
+    } else if (isObject(params)) {
+      // 重新处理参数
       params = Object.assign({}, xhr.baseData, options.data);
     }
   }
@@ -183,6 +183,8 @@ export default function xhr (options) {
   if (config.method === 'POST' || config.method === 'PUT') {
     if (config.headers['Content-Type'].indexOf('application/x-www-form-urlencoded') >= 0) {
       config.data = setData(params) || {};
+    } else if (config.headers['Content-Type'].indexOf('application/json') >= 0) {
+      config.data = JSON.stringify(params || {});
     } else {
       config.data = params || {};
     }
