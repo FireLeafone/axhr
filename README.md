@@ -29,7 +29,7 @@ npm install axhr axios --save
 yarn add axhr axios
 ```
 
-## config
+## use
 
 ```js
 xhr({
@@ -156,15 +156,15 @@ xhr.before = () => {}
 xhr.end = (res) => {}
 ```
 
-## example
+## global config
 
 ```js
 import xhr from 'axhr';
 import {message} from 'antd';
 import auth from './auth';
-import {apiBaseUrl} from './config';
 
 let apiUrl = '';
+const apiBaseUrl = '/';
 
 xhr.getUrl = option => {
   if (option.baseUrl) {
