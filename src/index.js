@@ -142,7 +142,8 @@ export default function xhr (options) {
   let params = options.data || {};
 
   // 全局部分配置 xhr.defaultConfig = {}
-  config = merge({}, config, xhr.defaultConfig || {}, options.config || {});
+  const defaultConf = typeof xhr.defaultConfig === 'function' ? xhr.defaultConfig() : xhr.defaultConfig;
+  config = merge({}, config, defaultConf || {}, options.config || {});
   // header
   if (options.headers) {
     config.headers = merge({}, config.headers, options.headers);

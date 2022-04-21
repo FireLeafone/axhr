@@ -73,6 +73,13 @@ xhr.defaultConfig = {
   timeout: 10000,
   withCredentials: true // cookie
 };
+// or
+xhr.defaultConfig = () => {
+  return {
+    timeout: 10000,
+    withCredentials: true // cookie
+  }
+}
 ```
 
 ### xhr.baseData
