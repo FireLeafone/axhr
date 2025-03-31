@@ -2,31 +2,31 @@ import xhr from '../src/index';
 
 const apiBaseUrl = '/api';
 
-xhr.getUrl = option => {
+xhr.getUrl = (option) => {
   if (option.baseUrl) {
     return {
       baseUrl: option.baseUrl,
-      url: option.url
+      url: option.url,
     };
   }
   return {
     baseUrl: apiBaseUrl,
-    url: option.url
+    url: option.url,
   };
 };
 
 xhr.baseData = {
-  t: Date.now()
+  t: Date.now(),
 };
 
 xhr.defaultConfig = {
   timeout: 10000,
   headers: {
-    ticket: 'xxx'
-  }
+    ticket: 'xxx',
+  },
 };
 
-xhr.success = (res) => {
+xhr.success = (res: any) => {
   let isSuccess = true;
 
   if (typeof res === 'string') {

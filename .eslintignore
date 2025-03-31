@@ -1,5 +1,9 @@
-node_modules/
-lib/
-dist/
-static/
-tests/
+/node_modules
+/public
+/configs
+/scripts
+docs
+lib
+es
+dist
+coverage

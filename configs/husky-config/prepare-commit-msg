@@ -1,0 +1,5 @@
+. "$(dirname "$0")/common.sh"
+
+# mac 执行被禁止，运行 chmod +x configs/husky-config/prepare-commit-msg
+
+pnpm devmoji -e --lint

@@ -1,0 +1,50 @@
+{
+  // see https://www.typescriptlang.org/tsconfig to better understand tsconfigs
+  "compilerOptions": {
+    "module": "esnext",
+    "target": "es2015",
+    "lib": ["dom", "esnext"],
+    "baseUrl": ".",
+    // output .d.ts declaration files for consumers
+    "declaration": true,
+    // output .js.map sourcemap files for consumers
+    "sourceMap": true,
+    // match output dir to input dir. e.g. dist/index instead of dist/src/index
+    // stricter type-checking for stronger correctness. Recommended by TS
+    "strict": true,
+    // linter checks for common issues
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    // noUnused* overlap with @typescript-eslint/no-unused-vars, can disable if duplicative
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitAny": true,
+    "noEmitOnError": true,
+    "strictNullChecks": true,
+    // use Node's module resolution algorithm, instead of the legacy TS one
+    "moduleResolution": "node",
+    // transpile JSX to React.createElement
+    "jsx": "react",
+    // interop between ESM and CJS modules. Recommended by TS
+    "esModuleInterop": true,
+    // significant perf increase by skipping checking .d.ts files, particularly those in node_modules. Recommended by TS
+    "skipLibCheck": true,
+    // error out if import and file system have a casing mismatch. Recommended by TS
+    "forceConsistentCasingInFileNames": true,
+    // ignores this option, but it is commonly used when type-checking separately with `tsc`
+    // "noEmit": true,
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true
+  },
+  "exclude": [
+    "node_modules",
+    "rollup.config.js",
+    "jest.config.ts",
+    ".eslintrc.js",
+    "scripts/**/*.js",
+    "es",
+    "lib",
+    "dist"
+  ]
+}

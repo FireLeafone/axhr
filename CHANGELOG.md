@@ -2,11 +2,12 @@
 
 > pm log 🚀
 
-## 0.4.7
+## 1.0.0
 
-`2024-02-23`
+`2025-03-30`
 
-- 🔥`xhr.defaultConfig` 函数模式支持回调传递参数options
+- 🔥 升级依赖`axios`
+- 🔥 支持 `TypeScript`
 
 ## 0.4.6
 

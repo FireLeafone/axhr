@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.json",
+  "include": ["src/**/*", "tests/**/*", "jest.config.ts"],
+  "exclude": ["node_modules", "**/es", "**/lib", "**/dist"],
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true
+  }
+}

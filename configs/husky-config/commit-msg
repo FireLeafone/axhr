@@ -1,0 +1,14 @@
+. "$(dirname "$0")/common.sh"
+
+# mac disabled, chmod +x configs/husky-config/commit-msg
+
+# npx --no -- commitlint --edit "$1"
+
+pnpm commitlint --edit "$1"
+
+commit_msg=$(cat "$1")
+
+if echo "$commit_msg" | grep -qP '[\x{4e00}-\x{9fa5}]'; then
+  echo "commit message should not contain Chinese characters"
+  exit 1
+fi

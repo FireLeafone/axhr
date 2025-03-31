@@ -1,0 +1,22 @@
+{
+  "extends": "./tsconfig.json",
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx"],
+  "exclude": [
+    "node_modules",
+    "**/es",
+    "**/lib",
+    "**/dist",
+    "tests",
+    "src/**/__tests__/**"
+  ],
+  "compilerOptions": {
+    "rootDir": "src",
+    "paths": {},
+    "declaration": true,
+    "composite": true,
+    "incremental": true,
+    "module": "esnext",
+    "target": "es2015",
+    "moduleResolution": "node"
+  }
+}
