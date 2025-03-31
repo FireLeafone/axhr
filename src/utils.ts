@@ -8,7 +8,7 @@ export const DEFAULT_VALUE = {};
 export function setData(params: any) {
   let sendData = params;
   if (isObject(sendData)) {
-    sendData = Object.assign({}, sendData);
+    sendData = { ...sendData };
     sendData = Object.keys(sendData)
       .map((key) => {
         let value = sendData[key];

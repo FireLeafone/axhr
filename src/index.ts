@@ -9,10 +9,10 @@ let cancelXhrs: any[] = [];
 // request interceptors
 server.interceptors.request.use(
   (config: any) => {
-    let cancelR = null;
-    if (config.cancelToken === undefined) {
-      config.cancelToken = defaultSource; // 默认使用统一的取消标识，统一取消
-    } else if (config.cancelToken) {
+    let cancelR: any = null;
+    if (config.isCancelToken === undefined) {
+      config.cancelToken = defaultSource.token; // 默认使用统一的取消标识，统一取消
+    } else if (config.isCancelToken) {
       config.cancelToken = new server.CancelToken((cancel) => {
         cancelXhrs.push({ url: config.url, cancel });
         cancelR = cancel;
@@ -30,9 +30,7 @@ server.interceptors.request.use(
 
     return config;
   },
-  function (err) {
-    return Promise.reject(err);
-  },
+  (err) => Promise.reject(err),
 );
 
 // respone interceptors
@@ -44,7 +42,7 @@ server.interceptors.response.use(
     }
     return response;
   },
-  function (err: any) {
+  (err: any) => {
     const { config: errConfig } = err;
     if (errConfig && errConfig.noRepeat) {
       repeatXhr.removePendingRequest(errConfig); // 从pendingRequest对象中移除请求
@@ -54,9 +52,9 @@ server.interceptors.response.use(
   },
 );
 
-export type XhrConfig = Omit<AxiosRequestConfig, 'cancelToken'> & {
+export type XhrConfig = AxiosRequestConfig & {
   noRepeat?: boolean;
-  cancelToken?: boolean;
+  isCancelToken?: boolean;
 };
 
 export interface XhrOptions {
@@ -82,14 +80,14 @@ export interface XhrProps {
   getUrl?: (options: XhrOptions) => { baseUrl: string; url: string };
   before?: (options: XhrOptions) => void;
   success?: (options: XhrOptions, response: any) => any;
-  error?: (options: XhrOptions, isCancel?: boolean) => any;
+  error?: (error: any, isCancel?: boolean) => any;
   cancelXhr?: (msg: string, urls?: string[]) => any;
   cancelMsg?: string;
-  end?: (options: XhrOptions) => void;
+  end?: (result: any, isError?: boolean) => void;
 }
 
 const xhr: XhrProps = {
-  request: request,
+  request,
   defaultConfig: {},
   baseData: {},
   getUrl: () => ({ baseUrl: '', url: '' }),
@@ -105,7 +103,7 @@ function request(options?: XhrOptions) {
         'The options field is required, and the type is object, for xhr !',
       );
     }
-    return Promise.reject('config is null');
+    return Promise.reject(new Error('config is null'));
   }
 
   let config: AxiosRequestConfig = {
@@ -129,12 +127,15 @@ function request(options?: XhrOptions) {
   }
 
   // 处理文件参数 upload file
-  if (config.headers['Content-Type'].indexOf('multipart/form-data') >= 0) {
+  if (
+    config.headers &&
+    config.headers['Content-Type']?.indexOf('multipart/form-data') >= 0
+  ) {
     if (options.data && 'append' in options.data) {
       params = options.data;
     } else {
       const formData = new FormData();
-      Object.keys(options.data || {}).map((key) => {
+      Object.keys(options.data || {}).forEach((key) => {
         formData.append(key, options.data?.[key]);
       });
       params = formData;
@@ -149,26 +150,31 @@ function request(options?: XhrOptions) {
    * 配置 xhr_config.js
    */
   if (xhr.baseData && isObject(xhr.baseData)) {
-    if (config.headers['Content-Type'].indexOf('multipart/form-data') >= 0) {
-      Object.keys(xhr.baseData).map((key) => {
+    if (
+      config.headers &&
+      config.headers['Content-Type']?.indexOf('multipart/form-data') >= 0
+    ) {
+      Object.keys(xhr.baseData).forEach((key) => {
         params.append(key, xhr.baseData?.[key]);
       });
     } else if (isObject(params)) {
       // 重新处理参数
-      params = Object.assign({}, xhr.baseData, options.data);
+      params = { ...xhr.baseData, ...options.data };
     }
   }
 
   // data
   if (config.method === 'POST' || config.method === 'PUT') {
     if (
-      config.headers['Content-Type'].indexOf(
+      config.headers &&
+      config.headers['Content-Type']?.indexOf(
         'application/x-www-form-urlencoded',
       ) >= 0
     ) {
       config.data = setData(params) || {};
     } else if (
-      config.headers['Content-Type'].indexOf('application/json') >= 0
+      config.headers &&
+      config.headers['Content-Type']?.indexOf('application/json') >= 0
     ) {
       config.data = JSON.stringify(params || {});
     } else {
@@ -278,7 +284,7 @@ function request(options?: XhrOptions) {
 
       const result = xhrerror ? xhrerror(err) || err : err;
       if (xhr.end) {
-        xhr.end(result);
+        xhr.end(result, true);
       }
       return result;
     })
@@ -295,20 +301,20 @@ xhr.cancelXhr = (msg: string, urls: string[] = []) => {
     if (urls && urls.length) {
       cancelXhrs = cancelXhrs.filter((c) => {
         if (urls.includes(c.url)) {
-          c.cancel('cancel request ' + msg);
+          c.cancel(`cancel request ${msg}`);
           return false;
         }
         return true;
       });
     } else {
-      cancelXhrs.forEach((c) => c.cancel('cancel request ' + msg));
+      cancelXhrs.forEach((c) => c.cancel(`cancel request ${msg}`));
       cancelXhrs = []; // 重置
     }
   }
 
   // 同时取消统一标识的请求
   if (!urls || !urls.length) {
-    defaultSource.cancel('cancel request ' + msg);
+    defaultSource.cancel(`cancel request ${msg}`);
     defaultSource = server.CancelToken.source(); // 刷新 defaultSource
   }
 };

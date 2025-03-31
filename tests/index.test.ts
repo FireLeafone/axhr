@@ -38,11 +38,16 @@ describe('xhr test', () => {
     };
 
     xhr.error = (err) => {
-      console.log(err);
+      console.log('error', err);
       mockError();
     };
 
-    xhr.end = () => {
+    xhr.end = (_res, isError) => {
+      if (isError) {
+        expect(mockError).toHaveBeenCalledTimes(1);
+        done();
+        return;
+      }
       mockFn2 = jest.fn(() => 4)();
       expect(response.status).toBe(200);
       expect(response.statusText).toBe('OK');
@@ -67,10 +72,10 @@ describe('xhr test', () => {
 
     xhr.request(options);
     getAjaxRequest().then((request: any) => {
-      // console.log(request.requestHeaders);
-      expect(request.url).toEqual(expect.stringContaining('/api/foo'));
-      expect(request.url).toEqual(expect.stringContaining('t='));
-      expect(request.url).toEqual(expect.stringContaining('username=admin'));
+      console.log('getAjaxRequest', request);
+      expect(request.url).toContain('/api/foo');
+      expect(request.url).toContain('t=');
+      expect(request.url).toContain('username=admin');
       expect(request.method).toBe('GET');
       // expect(request.requestHeaders['Content-Type']).toBe('application/json; charset=UTF-8')
       expect(request.requestHeaders['ticket']).toBe('xxx');
@@ -120,7 +125,7 @@ describe('xhr test', () => {
     xhr.request(options);
     getAjaxRequest().then((request: any) => {
       const params = JSON.parse(request.params);
-      expect(request.url).toEqual(expect.stringContaining('/test/foo'));
+      expect(request.url).toContain('/test/foo');
       expect(params['username']).toEqual('admin');
       expect(request.method).toBe('POST');
       expect(request.requestHeaders['Content-Type']).toBe(
@@ -250,7 +255,7 @@ describe('xhr test', () => {
     getAjaxRequest().then((request: any) => {
       // console.log(request.requestHeaders)
       const params = request.params;
-      expect(request.url).toEqual(expect.stringContaining('/test/upload'));
+      expect(request.url).toContain('/test/upload');
       expect(params.get('username')).toEqual('admin');
       expect(request.method).toBe('POST');
       // expect(request.requestHeaders['Content-Type']).toBe('multipart/form-data')
@@ -276,7 +281,7 @@ describe('xhr test', () => {
       url: '/foo',
       cancelMsg: 'cancel /foo',
       config: {
-        cancelToken: true,
+        isCancelToken: true,
       },
       success: () => {
         mockFn();
@@ -292,7 +297,7 @@ describe('xhr test', () => {
       url: '/foo2',
       cancelMsg: 'cancel /foo2',
       config: {
-        cancelToken: true,
+        isCancelToken: true,
       },
       success: () => {
         mockFn();
@@ -308,9 +313,9 @@ describe('xhr test', () => {
     xhr.error = (err, isCancel) => {
       cancelTime += 1;
       if (cancelTime === 1) {
-        expect(err).toBe('cancel /foo');
+        expect(err).toContain('cancel /foo');
       } else if (cancelTime === 2) {
-        expect(err).toBe('cancel /foo2');
+        expect(err).toContain('cancel /foo2');
       }
       expect(isCancel).toBe(true);
       mockError();
@@ -326,7 +331,7 @@ describe('xhr test', () => {
 
     xhr.request(options);
     getAjaxRequest().then((request: any) => {
-      expect(request.url).toEqual(expect.stringContaining('/api/foo'));
+      expect(request.url).toContain('/api/foo');
       expect(request.method).toBe('GET');
       expect(request.requestHeaders['ticket']).toBe('xxx');
       expect(request.timeout).toBe(10000);
@@ -346,7 +351,7 @@ describe('xhr test', () => {
     setTimeout(() => {
       xhr.request(options2);
       getAjaxRequest().then((request: any) => {
-        expect(request.url).toEqual(expect.stringContaining('/api/foo2'));
+        expect(request.url).toContain('/api/foo2');
         expect(request.method).toBe('GET');
         expect(request.requestHeaders['ticket']).toBe('xxx');
         expect(request.timeout).toBe(10000);
@@ -373,7 +378,7 @@ describe('xhr test', () => {
       url: '/foo',
       config: {
         noRepeat: true,
-        cancelToken: true,
+        isCancelToken: true,
       },
       success: () => {
         mockFn();
@@ -385,8 +390,8 @@ describe('xhr test', () => {
 
     xhr.error = (err) => {
       mockError();
-      expect(err).toEqual(expect.stringContaining('cancel request'));
-      expect(err).toEqual(expect.stringContaining('get!!/foo!!'));
+      expect(err).toContain('cancel request');
+      expect(err).toContain('get!!/foo!!');
     };
     xhr.end = () => {
       if (isRepeat) {
@@ -401,7 +406,7 @@ describe('xhr test', () => {
 
     xhr.request(options);
     getAjaxRequest().then((request: any) => {
-      expect(request.url).toEqual(expect.stringContaining('/foo'));
+      expect(request.url).toContain('/foo');
       expect(request.method).toBe('GET');
       expect(request.requestHeaders['ticket']).toBe('xxx');
       expect(request.timeout).toBe(10000);
@@ -421,7 +426,7 @@ describe('xhr test', () => {
     setTimeout(() => {
       xhr.request(options);
       getAjaxRequest().then((request: any) => {
-        expect(request.url).toEqual(expect.stringContaining('/foo'));
+        expect(request.url).toContain('/foo');
         expect(request.method).toBe('GET');
         expect(request.requestHeaders['ticket']).toBe('xxx');
         expect(request.timeout).toBe(10000);

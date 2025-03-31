@@ -34,7 +34,7 @@ const repeatXhr = {
     if (requestKey && this.has(requestKey)) {
       const cancel = this.get(requestKey);
       this.delete(requestKey);
-      cancel && cancel('cancel request ' + requestKey);
+      cancel && cancel(`cancel request ${requestKey}`);
     }
   },
 };

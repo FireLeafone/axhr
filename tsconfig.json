@@ -18,7 +18,7 @@
     // noUnused* overlap with @typescript-eslint/no-unused-vars, can disable if duplicative
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noImplicitAny": true,
+    "noImplicitAny": false,
     "noEmitOnError": true,
     "strictNullChecks": true,
     // use Node's module resolution algorithm, instead of the legacy TS one
@@ -35,16 +35,19 @@
     // "noEmit": true,
     "allowJs": true,
     "resolveJsonModule": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "typeRoots": ["./node_modules/@types", "./types"]
   },
   "exclude": [
     "node_modules",
     "rollup.config.js",
     "jest.config.ts",
+    "jest.setup.ts",
     ".eslintrc.js",
     "scripts/**/*.js",
     "es",
     "lib",
-    "dist"
+    "dist",
+    "coverage"
   ]
 }

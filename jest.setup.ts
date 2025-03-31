@@ -1,7 +1,13 @@
-import JasmineCore from 'jasmine-core';
-import 'jasmine-ajax';
-// 每次jest都会执行
+import jasmineCore from 'jasmine-core';
+
+// 初始化 jasmine
 // @ts-ignore
-global.getJasmineRequireObj = function () {
-  return JasmineCore;
+global.getJasmineRequireObj = () => {
+  return jasmineCore;
 };
+
+// @ts-ignore
+global.jasmine = jasmineCore;
+
+// @ts-ignore
+require('jasmine-ajax');

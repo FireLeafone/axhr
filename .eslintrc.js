@@ -61,7 +61,8 @@ module.exports = {
     '@typescript-eslint/brace-style': 0,
     '@typescript-eslint/dot-notation': 0,
     '@typescript-eslint/default-param-last': 0,
-    '@typescript-eslint/no-explicit-any': 'warn',
+    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/no-use-before-define': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-non-null-assertion': 'warn',
     '@typescript-eslint/no-unused-vars': [

@@ -4,32 +4,34 @@ import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import filesize from 'rollup-plugin-filesize';
 import typescript from '@rollup/plugin-typescript';
+import json from '@rollup/plugin-json';
 
 export default {
   input: 'src/index.ts',
   output: [
     {
-      name: 'chakra',
+      name: 'axhr',
       format: 'umd',
-      file: 'dist/chakra-umd.min.js',
+      file: 'dist/axhr.min.js',
       sourcemap: true,
     },
     {
-      name: 'chakra',
+      name: 'axhr',
       format: 'es',
-      file: 'dist/chakra-es.js',
+      file: 'dist/axhr-es.js',
     },
     {
-      name: 'chakra',
+      name: 'axhr',
       format: 'cjs',
-      file: 'dist/chakra-cjs.js',
+      file: 'dist/axhr-cjs.js',
     },
   ],
-  external: {},
+  external: ['axios'],
   plugins: [
     typescript({
       declaration: false,
     }),
+    json(),
     resolve(),
     commonjs(),
     replace({

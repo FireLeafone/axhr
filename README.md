@@ -29,7 +29,36 @@ yarn add axhr axios
 
 ## use
 
-```js
+```ts
+export interface XhrOptions {
+  url: string;
+  type?: string;
+  baseUrl?: string;
+  data?: Record<string, any>;
+  config?: XhrConfig;
+  headers?: Record<string, any>;
+  success?: (data: any, response: any) => any;
+  error?: (error: any) => any;
+  cancel?: (error: any) => any;
+  cancelMsg?: string;
+  before?: () => void;
+  end?: (result: any) => void;
+}
+
+export interface XhrProps {
+  request: (options?: XhrOptions) => Promise<any>;
+  baseUrl?: string;
+  defaultConfig?: ((options: XhrOptions) => any) | Partial<XhrConfig>;
+  baseData?: Record<string, any>;
+  getUrl?: (options: XhrOptions) => { baseUrl: string; url: string };
+  before?: (options: XhrOptions) => void;
+  success?: (options: XhrOptions, response: any) => any;
+  error?: (error: any, isCancel?: boolean) => any;
+  cancelXhr?: (msg: string, urls?: string[]) => any;
+  cancelMsg?: string;
+  end?: (result: any, isError?: boolean) => void;
+}
+
 xhr.request({
   url: '/add',
   type: 'GET',
@@ -57,7 +86,7 @@ xhr.request({
 - **cancel**: 取消请求响应
 - **cancelMsg**: 取消请求提示信息
 - **config**: 请求配置项，详情见[https://github.com/axios/axios#request-config](https://github.com/axios/axios#request-config)
-  - **cancelToken**：`false`, 默认当前请求不参与取消请求; 也可以设置`true`，独立token
+  - **isCancelToken**：`false`, 默认当前请求不参与取消请求; 也可以设置`true`，独立token
   - **noRepeat**: `false`, 默认不判断重复请求, `cancelToken` 必须是 `true` 将会取消还未响应结束的上一个重复请求
 
 ## API
